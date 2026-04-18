@@ -37,8 +37,8 @@
   <section>
     <h2>Formula</h2>
     <div class="formula">
-      <span class="highlight">X</span> = year − 2025
-      <span class="comment">&emsp;// 0–255 → years 2025–2280</span><br>
+      <span class="highlight">X</span> = year − 2000
+      <span class="comment">&emsp;// 0–255 → years 2000–2255</span><br>
       <span class="highlight">Y</span> = month
       <span class="comment">&emsp;// 1–12</span><br>
       <span class="highlight">Z</span> = day × 1000 + hour × 10 + ⌊minute ÷ 10⌋
@@ -90,14 +90,14 @@
           <tr><th>Datetime</th><th>Version</th><th>How to read it</th></tr>
         </thead>
         <tbody>
-          <tr><td>2025-01-01 00:00</td><td class="version">0.1.1000</td><td>Year 0, Jan, day 1 00:00</td></tr>
-          <tr><td>2025-04-17 08:30</td><td class="version">0.4.17083</td><td>Year 0, Apr, day 17 08:30</td></tr>
-          <tr><td>2026-04-17 08:30</td><td class="version">1.4.17083</td><td>Year 1, Apr, day 17 08:30</td></tr>
-          <tr><td>2026-12-31 23:50</td><td class="version">1.12.31235</td><td>Year 1, Dec, day 31 23:50</td></tr>
-          <tr><td>2030-06-01 00:00</td><td class="version">5.6.1000</td><td>Year 5, Jun, day 1 00:00</td></tr>
-          <tr><td>2033-08-20 12:00</td><td class="version">8.8.20120</td><td>Year 8, Aug, day 20 12:00</td></tr>
-          <tr><td>2050-12-25 07:00</td><td class="version">25.12.25070</td><td>Year 25, Dec, day 25 07:00</td></tr>
-          <tr><td>2100-03-15 16:40</td><td class="version">75.3.15164</td><td>Year 75, Mar, day 15 16:40</td></tr>
+          <tr><td>2025-01-01 00:00</td><td class="version">25.1.1000</td><td>Year 25, Jan, day 1 00:00</td></tr>
+          <tr><td>2025-04-17 08:30</td><td class="version">25.4.17083</td><td>Year 25, Apr, day 17 08:30</td></tr>
+          <tr><td>2026-04-17 08:30</td><td class="version">26.4.17083</td><td>Year 26, Apr, day 17 08:30</td></tr>
+          <tr><td>2026-12-31 23:50</td><td class="version">26.12.31235</td><td>Year 26, Dec, day 31 23:50</td></tr>
+          <tr><td>2030-06-01 00:00</td><td class="version">30.6.1000</td><td>Year 30, Jun, day 1 00:00</td></tr>
+          <tr><td>2033-08-20 12:00</td><td class="version">33.8.20120</td><td>Year 33, Aug, day 20 12:00</td></tr>
+          <tr><td>2050-12-25 07:00</td><td class="version">50.12.25070</td><td>Year 50, Dec, day 25 07:00</td></tr>
+          <tr><td>2100-03-15 16:40</td><td class="version">100.3.15164</td><td>Year 100, Mar, day 15 16:40</td></tr>
         </tbody>
       </table>
     </div>
@@ -131,7 +131,7 @@
       component in descending significance order.
     </div>
     <div class="note">
-      <strong>255-year range.</strong> The epoch is 2025. X = 255 corresponds to the year 2280.
+      <strong>255-year range.</strong> The epoch is 2000. X = 255 corresponds to the year 2255.
       You will not run out.
     </div>
     <div class="note">
@@ -157,11 +157,11 @@
 </main>
 
 <footer>
-  ver.rac.so — epoch 2025
+  ver.rac.so — epoch 2000
 </footer>
 
 <script>
-const EPOCH = 2025;
+const EPOCH = 2000;
 
 function toSunVer(dt) {
   const x = dt.getFullYear() - EPOCH;

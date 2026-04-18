@@ -62,7 +62,7 @@
       <a href="sun.html" class="scheme-card" data-scheme="sun">
         <div class="card-name">SunVer</div>
         <div class="card-tagline">Read it like a sundial — just look.</div>
-        <div class="card-spec">X = year − 2025 &emsp; Y = month &emsp; Z = dd×1000 + HH×10 + m</div>
+        <div class="card-spec">X = year − 2000 &emsp; Y = month &emsp; Z = dd×1000 + HH×10 + m</div>
         <div class="card-meta">
           <span><span class="label">range</span> <span class="value">255 years</span></span>
           <span><span class="label">resolution</span> <span class="value">10 min</span></span>
@@ -171,14 +171,15 @@
 </main>
 
 <footer>
-  ver.rac.so — epoch 2025
+  ver.rac.so
 </footer>
 
 <script>
+const EPOCH_SUN = 2000;
 const EPOCH = 2025;
 
 function toSunVer(dt) {
-  const x = dt.getFullYear() - EPOCH;
+  const x = dt.getFullYear() - EPOCH_SUN;
   const y = dt.getMonth() + 1;
   const z = dt.getDate() * 1000 + dt.getHours() * 10 + Math.floor(dt.getMinutes() / 10);
   return `${x}.${y}.${z}`;
