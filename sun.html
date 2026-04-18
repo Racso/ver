@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SunVer — Full Calendar Versioning</title>
+  <title>SunVer — Plain Datetime Versioning</title>
   <link rel="stylesheet" href="style.css">
   <style>
     :root {
@@ -19,6 +19,8 @@
   <span class="sep">/</span>
   <a href="sun.html" class="active">SunVer</a>
   <span class="sep">/</span>
+  <a href="light.html">LightVer</a>
+  <span class="sep">/</span>
   <a href="moon.html">MoonVer</a>
   <span class="sep">/</span>
   <a href="bin.html">BinVer</a>
@@ -26,60 +28,41 @@
 
 <main>
   <section class="hero">
-    <p class="subtitle">Full Calendar Versioning</p>
+    <p class="subtitle">Plain Datetime Versioning</p>
     <h1><span class="accent">Sun</span>Ver</h1>
     <p class="lead">
-      Read it like a sundial — just look. Year, month, day, and time are all directly
-      readable with zero math. The only cost: 10-minute resolution.
+      The version <em>is</em> the date. No encoding, no epoch, no math.
+      Just the year, month-day, and time — written directly into X.Y.Z.
     </p>
   </section>
 
   <section>
     <h2>Formula</h2>
     <div class="formula">
-      <span class="highlight">X</span> = year − 2000
-      <span class="comment">&emsp;// 0–255 → years 2000–2255</span><br>
-      <span class="highlight">Y</span> = month
-      <span class="comment">&emsp;// 1–12</span><br>
-      <span class="highlight">Z</span> = day × 1000 + hour × 10 + ⌊minute ÷ 10⌋
-      <span class="comment">&emsp;// 1000–31235</span>
+      <span class="highlight">X</span> = year
+      <span class="comment">&emsp;// 2026, 2027, …</span><br>
+      <span class="highlight">Y</span> = month × 100 + day
+      <span class="comment">&emsp;// 101–1231</span><br>
+      <span class="highlight">Z</span> = hour × 100 + minute
+      <span class="comment">&emsp;// 0–2359</span>
     </div>
     <div class="constraint-box">
       <div class="constraint">
         <div class="component">X</div>
-        <div class="range">0 – 255</div>
-        <div class="maps-to">Year offset</div>
+        <div class="range">year</div>
+        <div class="maps-to">YYYY</div>
       </div>
       <div class="constraint">
         <div class="component">Y</div>
-        <div class="range">1 – 12</div>
-        <div class="maps-to">Month</div>
+        <div class="range">101 – 1231</div>
+        <div class="maps-to">MMdd</div>
       </div>
       <div class="constraint">
         <div class="component">Z</div>
-        <div class="range">1000 – 31235</div>
-        <div class="maps-to">dd | HH | m</div>
+        <div class="range">0 – 2359</div>
+        <div class="maps-to">HHmm</div>
       </div>
     </div>
-  </section>
-
-  <section>
-    <h2>Reading Z</h2>
-    <p>
-      Z encodes day, hour, and the tens digit of minutes as concatenated digits.
-      For a 4-digit Z, the first digit is the day; for a 5-digit Z, the first two are the day.
-      The next two digits are the hour. The last digit is the tens of minutes.
-    </p>
-    <div class="formula">
-      <span class="highlight">17083</span> → day <strong>17</strong>, hour <strong>08</strong>, minute <strong>30</strong><br>
-      <span class="highlight">1000</span>&nbsp; → day <strong>1</strong>, hour <strong>00</strong>, minute <strong>00</strong><br>
-      <span class="highlight">25183</span> → day <strong>25</strong>, hour <strong>18</strong>, minute <strong>30</strong><br>
-      <span class="highlight">5221</span>&nbsp; → day <strong>5</strong>, hour <strong>22</strong>, minute <strong>10</strong>
-    </div>
-    <p>
-      Formally: <code>day = Z ÷ 1000</code>, <code>hour = (Z mod 1000) ÷ 10</code>,
-      <code>minutes = (Z mod 10) × 10</code>. But in practice, you just read the digits.
-    </p>
   </section>
 
   <section>
@@ -90,17 +73,20 @@
           <tr><th>Datetime</th><th>Version</th><th>How to read it</th></tr>
         </thead>
         <tbody>
-          <tr><td>2025-01-01 00:00</td><td class="version">25.1.1000</td><td>Year 25, Jan, day 1 00:00</td></tr>
-          <tr><td>2025-04-17 08:30</td><td class="version">25.4.17083</td><td>Year 25, Apr, day 17 08:30</td></tr>
-          <tr><td>2026-04-17 08:30</td><td class="version">26.4.17083</td><td>Year 26, Apr, day 17 08:30</td></tr>
-          <tr><td>2026-12-31 23:50</td><td class="version">26.12.31235</td><td>Year 26, Dec, day 31 23:50</td></tr>
-          <tr><td>2030-06-01 00:00</td><td class="version">30.6.1000</td><td>Year 30, Jun, day 1 00:00</td></tr>
-          <tr><td>2033-08-20 12:00</td><td class="version">33.8.20120</td><td>Year 33, Aug, day 20 12:00</td></tr>
-          <tr><td>2050-12-25 07:00</td><td class="version">50.12.25070</td><td>Year 50, Dec, day 25 07:00</td></tr>
-          <tr><td>2100-03-15 16:40</td><td class="version">100.3.15164</td><td>Year 100, Mar, day 15 16:40</td></tr>
+          <tr><td>2025-01-01 00:00</td><td class="version">2025.101.0</td><td>2025, Jan 01, 00:00</td></tr>
+          <tr><td>2026-04-17 08:30</td><td class="version">2026.417.830</td><td>2026, Apr 17, 08:30</td></tr>
+          <tr><td>2026-12-31 23:59</td><td class="version">2026.1231.2359</td><td>2026, Dec 31, 23:59</td></tr>
+          <tr><td>2027-07-04 14:00</td><td class="version">2027.704.1400</td><td>2027, Jul 04, 14:00</td></tr>
+          <tr><td>2030-06-01 00:00</td><td class="version">2030.601.0</td><td>2030, Jun 01, 00:00</td></tr>
+          <tr><td>2033-08-20 12:00</td><td class="version">2033.820.1200</td><td>2033, Aug 20, 12:00</td></tr>
+          <tr><td>2050-11-15 09:45</td><td class="version">2050.1115.945</td><td>2050, Nov 15, 09:45</td></tr>
         </tbody>
       </table>
     </div>
+    <p>
+      There's nothing to decode. <code>2026.417.830</code> is April 17th, 2026 at 08:30.
+      You just read it.
+    </p>
   </section>
 
   <section>
@@ -116,7 +102,7 @@
     <div class="converter" style="margin-top: 12px">
       <div class="converter-row">
         <label for="ver-input">Version</label>
-        <input type="text" id="ver-input" placeholder="1.4.17083">
+        <input type="text" id="ver-input" placeholder="2026.417.830">
       </div>
       <div class="result" id="rev-result">—</div>
       <div class="decoded" id="rev-decoded"></div>
@@ -126,66 +112,63 @@
   <section>
     <h2>Properties</h2>
     <div class="note">
-      <strong>Monotonic sorting.</strong> Versions sort correctly using standard version comparison
-      (X first, then Y, then Z), because year, month, and day+time are each in their own
-      component in descending significance order.
+      <strong>Monotonic sorting.</strong> Year, month+day, and time are each in their own
+      component in descending significance. Standard version comparison produces
+      chronological order.
     </div>
     <div class="note">
-      <strong>255-year range.</strong> The epoch is 2000. X = 255 corresponds to the year 2255.
-      You will not run out.
+      <strong>No range limit.</strong> X is the year itself, so the scheme works for as long
+      as the Gregorian calendar does. No epoch, no overflow.
     </div>
     <div class="note">
-      <strong>10-minute resolution.</strong> The last digit of Z represents tens of minutes (0–5).
-      Two builds within the same 10-minute window will produce the same version.
-      In practice this is a non-issue for release builds.
+      <strong>Minute resolution.</strong> Z = HHmm, so every minute is distinguishable.
+    </div>
+    <div class="note">
+      <strong>Platform compatibility.</strong> X exceeds 255, so SunVer is
+      <strong>not compatible with Windows MSI</strong> installers. It works on macOS
+      (CFBundleVersion), Linux (deb/rpm), Android (versionName), iOS, NSIS, and
+      any system where version components can exceed 255. For MSI-constrained projects, use
+      <a href="light.html">LightVer</a>.
     </div>
   </section>
 
   <section>
     <h2>When to use SunVer</h2>
     <p>
-      SunVer is best for <strong>human-facing releases</strong> — game builds, desktop apps,
-      mobile apps — where someone on the team will glance at a version number and want to
-      immediately know when it was built. The 10-minute resolution is more than sufficient
-      for any release cadence that involves humans.
+      SunVer is the <strong>default recommendation</strong>. Use it unless you have a specific
+      reason not to. It's the most readable scheme in the family — anyone on the team
+      (devs, QA, PMs) can read a version number instantly without learning any encoding rules.
     </p>
     <p>
-      For CI pipelines that produce multiple builds per minute, consider
-      <a href="moon.html">MoonVer</a> or <a href="bin.html">BinVer</a>.
+      Only fall back to <a href="light.html">LightVer</a> if you need Windows MSI compatibility,
+      or to <a href="moon.html">MoonVer</a> / <a href="bin.html">BinVer</a> for tighter
+      constraints.
     </p>
   </section>
 </main>
 
-<footer>
-  ver.rac.so — epoch 2000
-</footer>
+<footer>ver.rac.so</footer>
 
 <script>
-const EPOCH = 2000;
-
 function toSunVer(dt) {
-  const x = dt.getFullYear() - EPOCH;
-  const y = dt.getMonth() + 1;
-  const z = dt.getDate() * 1000 + dt.getHours() * 10 + Math.floor(dt.getMinutes() / 10);
+  const x = dt.getFullYear();
+  const y = (dt.getMonth() + 1) * 100 + dt.getDate();
+  const z = dt.getHours() * 100 + dt.getMinutes();
   return `${x}.${y}.${z}`;
 }
 
 function fromSunVer(ver) {
   const [x, y, z] = ver.split('.').map(Number);
   if (isNaN(x) || isNaN(y) || isNaN(z)) return null;
-  const year = EPOCH + x;
-  const month = y;
-  const day = Math.floor(z / 1000);
-  const hour = Math.floor((z % 1000) / 10);
-  const min = (z % 10) * 10;
-  return new Date(year, month - 1, day, hour, min);
+  const year = x;
+  const month = Math.floor(y / 100);
+  const day = y % 100;
+  const hour = Math.floor(z / 100);
+  const minute = z % 100;
+  return new Date(year, month - 1, day, hour, minute);
 }
 
 function fmt(dt) {
-  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')} ${String(dt.getHours()).padStart(2,'0')}:${String(Math.floor(dt.getMinutes()/10)*10).padStart(2,'0')}`;
-}
-
-function fmtFull(dt) {
   return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;
 }
 
@@ -215,8 +198,8 @@ function updateReverse() {
     document.getElementById('rev-decoded').textContent = '';
     return;
   }
-  document.getElementById('rev-result').textContent = fmtFull(dt);
-  document.getElementById('rev-decoded').textContent = `year ${dt.getFullYear() - EPOCH}, month ${dt.getMonth()+1}`;
+  document.getElementById('rev-result').textContent = fmt(dt);
+  document.getElementById('rev-decoded').textContent = '';
 }
 
 dtInput.addEventListener('input', updateForward);

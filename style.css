@@ -15,6 +15,8 @@
 
   --sun:       #f0a030;
   --sun-dim:   #f0a03020;
+  --light:     #f0c860;
+  --light-dim: #f0c86020;
   --moon:      #9966ff;
   --moon-dim:  #9966ff20;
   --bin:       #2a9d8f;
@@ -222,6 +224,8 @@ a:hover { text-decoration: underline; }
 
 .scheme-card[data-scheme="sun"] { border-left: 3px solid var(--sun); }
 .scheme-card[data-scheme="sun"]:hover { border-color: var(--sun); box-shadow: 0 8px 32px rgba(240,160,48,0.1); }
+.scheme-card[data-scheme="light"] { border-left: 3px solid var(--light); }
+.scheme-card[data-scheme="light"]:hover { border-color: var(--light); box-shadow: 0 8px 32px rgba(240,200,96,0.1); }
 .scheme-card[data-scheme="moon"] { border-left: 3px solid var(--moon); }
 .scheme-card[data-scheme="moon"]:hover { border-color: var(--moon); box-shadow: 0 8px 32px rgba(153,102,255,0.1); }
 .scheme-card[data-scheme="bin"] { border-left: 3px solid var(--bin); }
@@ -235,6 +239,7 @@ a:hover { text-decoration: underline; }
 }
 
 .scheme-card[data-scheme="sun"] .card-name { color: var(--sun); }
+.scheme-card[data-scheme="light"] .card-name { color: var(--light); }
 .scheme-card[data-scheme="moon"] .card-name { color: var(--moon); }
 .scheme-card[data-scheme="bin"] .card-name { color: var(--bin); }
 
@@ -394,6 +399,7 @@ td.version { font-weight: 500; color: var(--accent); }
    ================================================================ */
 .comparison td:first-child { font-weight: 500; }
 .comparison .sun { color: var(--sun); }
+.comparison .light { color: var(--light); }
 .comparison .moon { color: var(--moon); }
 .comparison .bin { color: var(--bin); }
 

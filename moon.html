@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MoonVer — Paired Calendar Versioning</title>
+  <title>MoonVer — Compact Calendar Versioning</title>
   <link rel="stylesheet" href="style.css">
   <style>
     :root {
@@ -19,6 +19,8 @@
   <span class="sep">/</span>
   <a href="sun.html">SunVer</a>
   <span class="sep">/</span>
+  <a href="light.html">LightVer</a>
+  <span class="sep">/</span>
   <a href="moon.html" class="active">MoonVer</a>
   <span class="sep">/</span>
   <a href="bin.html">BinVer</a>
@@ -26,24 +28,22 @@
 
 <main>
   <section class="hero">
-    <p class="subtitle">Paired Calendar Versioning</p>
+    <p class="subtitle">Compact Calendar Versioning</p>
     <h1><span class="accent">Moon</span>Ver</h1>
     <p class="lead">
-      Day and time are instantly readable. Year and month require a quick ÷12 — like
-      counting lunar cycles. Minute-level precision with 40 years of range.
+      Day and time are instantly readable. Year and month are packed into X with a
+      simple ÷20. Minute-level precision, MSI-compatible, designed for projects
+      with a defined lifespan.
     </p>
   </section>
 
   <section>
     <h2>Formula</h2>
     <div class="formula">
-      group = ⌊(year − 2025) ÷ 2⌋<br>
-      half&ensp; = (year − 2025) mod 2
-      <span class="comment">&emsp;// 0 or 1</span><br><br>
-      <span class="highlight">X</span> = group × 12 + month
+      <span class="highlight">X</span> = (year − 2025) × 20 + month
       <span class="comment">&emsp;// 1–252</span><br>
-      <span class="highlight">Y</span> = half × 100 + day
-      <span class="comment">&emsp;// 1–131</span><br>
+      <span class="highlight">Y</span> = day
+      <span class="comment">&emsp;// 1–31</span><br>
       <span class="highlight">Z</span> = hour × 100 + minute
       <span class="comment">&emsp;// 0–2359</span>
     </div>
@@ -51,12 +51,12 @@
       <div class="constraint">
         <div class="component">X</div>
         <div class="range">1 – 252</div>
-        <div class="maps-to">Group + Month</div>
+        <div class="maps-to">Year + Month</div>
       </div>
       <div class="constraint">
         <div class="component">Y</div>
-        <div class="range">1 – 131</div>
-        <div class="maps-to">Half + Day</div>
+        <div class="range">1 – 31</div>
+        <div class="maps-to">Day</div>
       </div>
       <div class="constraint">
         <div class="component">Z</div>
@@ -67,20 +67,18 @@
   </section>
 
   <section>
-    <h2>The paired-year trick</h2>
+    <h2>Decoding X</h2>
     <p>
-      Years are grouped in pairs. The first year of each pair has Y = day (1–31).
-      The second year has Y = 100 + day (101–131). This doubles the effective year range
-      without breaking sort order, because 101 &gt; 31 within the same X.
+      X packs year and month using a ×20 multiplier. To decode, divide by 20:
+      the quotient is the year offset, the remainder is the month.
+      Dividing by 20 is easy — just divide by 2 and shift the decimal.
     </p>
     <div class="formula">
-      Y = <strong>17</strong>&emsp; → first year of the pair, day 17<br>
-      Y = <strong>117</strong> → second year of the pair, day 17
+      <span class="highlight">24</span> ÷ 20 = <strong>1</strong> remainder <strong>4</strong> → year 1 (2026), April<br>
+      <span class="highlight">47</span> ÷ 20 = <strong>2</strong> remainder <strong>7</strong> → year 2 (2027), July<br>
+      <span class="highlight">121</span> ÷ 20 = <strong>6</strong> remainder <strong>1</strong> → year 6 (2031), January<br>
+      <span class="highlight">252</span> ÷ 20 = <strong>12</strong> remainder <strong>12</strong> → year 12 (2037), December
     </div>
-    <p>
-      To decode X: divide by 12. The quotient is the group (each group = 2 years),
-      the remainder is the month. Total year = 2025 + group × 2 + half.
-    </p>
   </section>
 
   <section>
@@ -91,34 +89,14 @@
           <tr><th>Datetime</th><th>Version</th><th>How to decode</th></tr>
         </thead>
         <tbody>
-          <tr><td>2025-01-01 00:00</td><td class="version">1.1.0</td><td>1÷12 = g0 r1 → Jan 2025, day 1, 00:00</td></tr>
-          <tr><td>2025-04-17 08:30</td><td class="version">4.17.830</td><td>4÷12 = g0 r4 → Apr 2025, day 17, 08:30</td></tr>
-          <tr><td>2026-04-17 08:30</td><td class="version">4.117.830</td><td>g0 r4 → Apr, Y=117 → +1 yr → 2026, day 17</td></tr>
-          <tr><td>2026-12-31 23:59</td><td class="version">12.131.2359</td><td>g0 r12 → Dec, Y=131 → 2026, day 31</td></tr>
-          <tr><td>2030-06-15 12:00</td><td class="version">36.115.1200</td><td>36÷12 = g3 r0… wait: g2 r12 → Dec? No:</td></tr>
-          <tr><td>2030-06-15 12:00</td><td class="version">36.115.1200</td><td>36÷12 = g3 r0 → but r0 isn't a month…</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="note">
-      <strong>Edge case:</strong> When month = 12, X = group × 12 + 12, which means
-      X ÷ 12 gives (group+1) remainder 0. The decoder must treat remainder 0 as month 12
-      of the previous group. This is handled in the converter below.
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>Datetime</th><th>Version</th><th>Decoded</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>2025-01-01 00:00</td><td class="version">1.1.0</td><td>2025-01-01 00:00</td></tr>
-          <tr><td>2025-04-17 08:30</td><td class="version">4.17.830</td><td>2025-04-17 08:30</td></tr>
-          <tr><td>2026-04-17 08:30</td><td class="version">4.117.830</td><td>2026-04-17 08:30</td></tr>
-          <tr><td>2027-07-04 14:00</td><td class="version">19.4.1400</td><td>2027-07-04 14:00</td></tr>
-          <tr><td>2030-06-15 12:00</td><td class="version">36.115.1200</td><td>2030-06-15 12:00</td></tr>
-          <tr><td>2033-08-20 12:00</td><td class="version">56.20.1200</td><td>2033-08-20 12:00</td></tr>
-          <tr><td>2050-12-31 23:59</td><td class="version">168.131.2359</td><td>2050-12-31 23:59</td></tr>
-          <tr><td>2065-06-15 09:00</td><td class="version">246.15.900</td><td>2065-06-15 09:00</td></tr>
+          <tr><td>2025-01-01 00:00</td><td class="version">1.1.0</td><td>1÷20 = y0 r1 → Jan 2025, day 1, 00:00</td></tr>
+          <tr><td>2025-04-17 08:30</td><td class="version">4.17.830</td><td>4÷20 = y0 r4 → Apr 2025, day 17, 08:30</td></tr>
+          <tr><td>2026-04-17 08:30</td><td class="version">24.17.830</td><td>24÷20 = y1 r4 → Apr 2026, day 17, 08:30</td></tr>
+          <tr><td>2026-12-31 23:59</td><td class="version">32.31.2359</td><td>32÷20 = y1 r12 → Dec 2026, day 31, 23:59</td></tr>
+          <tr><td>2027-07-04 14:00</td><td class="version">47.4.1400</td><td>47÷20 = y2 r7 → Jul 2027, day 4, 14:00</td></tr>
+          <tr><td>2030-06-15 12:00</td><td class="version">106.15.1200</td><td>106÷20 = y5 r6 → Jun 2030, day 15, 12:00</td></tr>
+          <tr><td>2033-08-20 12:00</td><td class="version">168.20.1200</td><td>168÷20 = y8 r8 → Aug 2033, day 20, 12:00</td></tr>
+          <tr><td>2037-12-25 07:00</td><td class="version">252.25.700</td><td>252÷20 = y12 r12 → Dec 2037, day 25, 07:00</td></tr>
         </tbody>
       </table>
     </div>
@@ -137,7 +115,7 @@
     <div class="converter" style="margin-top: 12px">
       <div class="converter-row">
         <label for="ver-input">Version</label>
-        <input type="text" id="ver-input" placeholder="4.117.830">
+        <input type="text" id="ver-input" placeholder="24.17.830">
       </div>
       <div class="result" id="rev-result">—</div>
       <div class="decoded" id="rev-decoded"></div>
@@ -147,44 +125,47 @@
   <section>
     <h2>Properties</h2>
     <div class="note">
-      <strong>Monotonic sorting.</strong> The paired-year trick preserves sort order. Within the
-      same X, the second year (Y ≥ 101) always sorts above the first year (Y ≤ 31). Across
-      different X values, X itself is monotonically increasing.
+      <strong>Monotonic sorting.</strong> X encodes year+month in a single increasing number.
+      Y is the day. Z is the time. Standard version comparison produces chronological order.
     </div>
     <div class="note">
-      <strong>40-year range.</strong> Group max = 20 (X = 20×12+12 = 252 ≤ 255). With paired
-      years: 21 groups × 2 = 42 years → through 2065. (Group 20 only reaches month 3 at
-      X = 20×12+3 = 243, but paired gives 2065-03.)
+      <strong>12-year range.</strong> With epoch 2025, the scheme covers through
+      December 2037 (X = 252). Sufficient for most product lifecycles.
     </div>
     <div class="note">
       <strong>Minute resolution.</strong> Z = HHmm directly, so every minute is
-      distinguishable. Suitable for CI pipelines with frequent builds.
+      distinguishable.
+    </div>
+    <div class="note">
+      <strong>Full MSI compatibility.</strong> All components fit within 255.255.65535.
     </div>
   </section>
 
   <section>
     <h2>When to use MoonVer</h2>
     <p>
-      MoonVer is the middle ground: day and time are readable at a glance (Y and Z),
-      and the ÷12 on X is the only mental math needed. It offers minute-level precision
-      for CI-heavy teams while keeping versions human-friendly enough for changelogs.
+      MoonVer is for projects that need <strong>minute-level precision under MSI constraints</strong>.
+      Day and time (Y and Z) are instantly readable — only X needs the ÷20 decode.
+      That single division changes at most once a month, so in practice your team memorizes
+      the current X value and only reads Y.Z.
+    </p>
+    <p>
+      If you don't need MSI, use <a href="sun.html">SunVer</a>.
+      If you don't need minute precision, <a href="light.html">LightVer</a> avoids the
+      ÷20 entirely.
     </p>
   </section>
 </main>
 
-<footer>
-  ver.rac.so — epoch 2025
-</footer>
+<footer>ver.rac.so</footer>
 
 <script>
 const EPOCH = 2025;
 
 function toMoonVer(dt) {
   const offset = dt.getFullYear() - EPOCH;
-  const group = Math.floor(offset / 2);
-  const half = offset % 2;
-  const x = group * 12 + (dt.getMonth() + 1);
-  const y = half * 100 + dt.getDate();
+  const x = offset * 20 + (dt.getMonth() + 1);
+  const y = dt.getDate();
   const z = dt.getHours() * 100 + dt.getMinutes();
   return `${x}.${y}.${z}`;
 }
@@ -192,13 +173,13 @@ function toMoonVer(dt) {
 function fromMoonVer(ver) {
   const [x, y, z] = ver.split('.').map(Number);
   if (isNaN(x) || isNaN(y) || isNaN(z)) return null;
-  let month = ((x - 1) % 12) + 1;
-  let group = Math.floor((x - month) / 12);
-  const half = Math.floor(y / 100);
-  const day = y % 100;
+  const month = ((x - 1) % 20) + 1;
+  if (month > 12) return null;
+  const offset = Math.floor((x - month) / 20);
+  const year = EPOCH + offset;
+  const day = y;
   const hour = Math.floor(z / 100);
   const minute = z % 100;
-  const year = EPOCH + group * 2 + half;
   return new Date(year, month - 1, day, hour, minute);
 }
 
@@ -234,7 +215,7 @@ function updateReverse() {
   }
   document.getElementById('rev-result').textContent = fmt(dt);
   const offset = dt.getFullYear() - EPOCH;
-  document.getElementById('rev-decoded').textContent = `group ${Math.floor(offset/2)}, ${offset % 2 === 0 ? 'first' : 'second'} year`;
+  document.getElementById('rev-decoded').textContent = `year offset ${offset}, month ${dt.getMonth()+1}`;
 }
 
 dtInput.addEventListener('input', updateForward);
