@@ -1,0 +1,478 @@
+/* ================================================================
+   VER — Datetime Versioning Schemes
+   Celestial almanac aesthetic
+   ================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap');
+
+:root {
+  --void:      #222c33;
+  --n2:        #29333e;
+  --n3:        #313f4c;
+  --n4:        #6a8090;
+  --n5:        #ccd6e0;
+  --n6:        #edf1f5;
+
+  --sun:       #f0a030;
+  --sun-dim:   #f0a03020;
+  --moon:      #9966ff;
+  --moon-dim:  #9966ff20;
+  --bin:       #2a9d8f;
+  --bin-dim:   #2a9d8f20;
+
+  --accent:    var(--n5);
+  --accent-dim:#ccd6e010;
+
+  --font-display: "Cormorant", Georgia, serif;
+  --font-body:    "Outfit", system-ui, sans-serif;
+  --font-mono:    "JetBrains Mono", monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-color: var(--n3) var(--void);
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 17px;
+  font-weight: 300;
+  line-height: 1.7;
+  color: var(--n5);
+  background: var(--void);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Starfield */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1px 1px at 25% 55%, rgba(255,255,255,0.25), transparent),
+    radial-gradient(1.5px 1.5px at 40% 10%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 55% 75%, rgba(255,255,255,0.2), transparent),
+    radial-gradient(1px 1px at 70% 30%, rgba(255,255,255,0.35), transparent),
+    radial-gradient(1.5px 1.5px at 85% 60%, rgba(255,255,255,0.45), transparent),
+    radial-gradient(1px 1px at 15% 80%, rgba(255,255,255,0.15), transparent),
+    radial-gradient(1px 1px at 90% 15%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1px 1px at 35% 90%, rgba(255,255,255,0.2), transparent),
+    radial-gradient(1.5px 1.5px at 60% 45%, rgba(255,255,255,0.35), transparent),
+    radial-gradient(1px 1px at 5% 50%, rgba(255,255,255,0.25), transparent),
+    radial-gradient(1px 1px at 78% 85%, rgba(255,255,255,0.2), transparent),
+    radial-gradient(1px 1px at 48% 35%, rgba(255,255,255,0.15), transparent),
+    radial-gradient(1.5px 1.5px at 92% 42%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1px 1px at 20% 95%, rgba(255,255,255,0.2), transparent);
+}
+
+/* Grain */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.03;
+  z-index: 50;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+/* ================================================================
+   NAV
+   ================================================================ */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 28px;
+  background: rgba(34,44,51,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--n3);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+nav a {
+  color: var(--n4);
+  text-decoration: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  transition: color 0.2s, background 0.2s;
+}
+
+nav a:hover { color: var(--n5); background: var(--n3); }
+nav a.active { color: var(--accent); background: var(--accent-dim); }
+
+nav .sep { color: var(--n3); margin: 0 2px; user-select: none; }
+nav .home { font-weight: 500; color: var(--n5); letter-spacing: 0.5px; }
+
+/* ================================================================
+   LAYOUT
+   ================================================================ */
+main {
+  position: relative;
+  z-index: 1;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 100px 28px 120px;
+}
+
+section { margin-bottom: 72px; }
+section:last-child { margin-bottom: 0; }
+
+/* ================================================================
+   TYPOGRAPHY
+   ================================================================ */
+h1 {
+  font-family: var(--font-display);
+  font-size: clamp(48px, 8vw, 80px);
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--n6);
+  letter-spacing: -1px;
+  margin-bottom: 20px;
+}
+
+h1 .accent { color: var(--accent); }
+
+h2 {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--n6);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--n3);
+}
+
+h3 {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--n4);
+  margin-bottom: 12px;
+}
+
+p { margin-bottom: 16px; }
+p:last-child { margin-bottom: 0; }
+
+.lead {
+  font-size: 20px;
+  font-weight: 300;
+  color: var(--n4);
+  line-height: 1.6;
+  max-width: 600px;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ================================================================
+   HERO
+   ================================================================ */
+.hero {
+  margin-bottom: 80px;
+  padding-top: 20px;
+}
+
+.hero .subtitle {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--n4);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+/* ================================================================
+   SCHEME CARDS (index)
+   ================================================================ */
+.schemes {
+  display: grid;
+  gap: 20px;
+}
+
+.scheme-card {
+  background: var(--n2);
+  border: 1px solid var(--n3);
+  border-radius: 8px;
+  padding: 32px;
+  text-decoration: none;
+  transition: border-color 0.3s, transform 0.2s, box-shadow 0.3s;
+  display: block;
+}
+
+.scheme-card:hover {
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+.scheme-card[data-scheme="sun"] { border-left: 3px solid var(--sun); }
+.scheme-card[data-scheme="sun"]:hover { border-color: var(--sun); box-shadow: 0 8px 32px rgba(240,160,48,0.1); }
+.scheme-card[data-scheme="moon"] { border-left: 3px solid var(--moon); }
+.scheme-card[data-scheme="moon"]:hover { border-color: var(--moon); box-shadow: 0 8px 32px rgba(153,102,255,0.1); }
+.scheme-card[data-scheme="bin"] { border-left: 3px solid var(--bin); }
+.scheme-card[data-scheme="bin"]:hover { border-color: var(--bin); box-shadow: 0 8px 32px rgba(42,157,143,0.1); }
+
+.scheme-card .card-name {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.scheme-card[data-scheme="sun"] .card-name { color: var(--sun); }
+.scheme-card[data-scheme="moon"] .card-name { color: var(--moon); }
+.scheme-card[data-scheme="bin"] .card-name { color: var(--bin); }
+
+.scheme-card .card-tagline {
+  font-size: 15px;
+  color: var(--n4);
+  margin-bottom: 16px;
+}
+
+.scheme-card .card-spec {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--n5);
+  background: var(--void);
+  padding: 10px 14px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.card-meta {
+  display: flex;
+  gap: 24px;
+  font-size: 13px;
+  color: var(--n4);
+  font-family: var(--font-mono);
+}
+
+.card-meta span { display: flex; align-items: center; gap: 6px; }
+.card-meta .label { color: var(--n4); }
+.card-meta .value { color: var(--n5); }
+
+/* ================================================================
+   FORMULA BOX
+   ================================================================ */
+.formula {
+  background: var(--n2);
+  border: 1px solid var(--n3);
+  border-radius: 8px;
+  padding: 28px 32px;
+  margin: 24px 0;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  line-height: 2;
+  color: var(--n5);
+}
+
+.formula .comment {
+  color: var(--n4);
+  font-size: 13px;
+}
+
+.formula .highlight { color: var(--accent); font-weight: 500; }
+
+/* ================================================================
+   TABLE
+   ================================================================ */
+.table-wrap {
+  overflow-x: auto;
+  margin: 24px 0;
+  border-radius: 8px;
+  border: 1px solid var(--n3);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+  font-family: var(--font-mono);
+}
+
+thead {
+  background: var(--n2);
+}
+
+th {
+  text-align: left;
+  padding: 12px 16px;
+  font-weight: 500;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--n4);
+  border-bottom: 1px solid var(--n3);
+}
+
+td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--n3);
+  color: var(--n5);
+}
+
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(255,255,255,0.02); }
+
+td.version { font-weight: 500; color: var(--accent); }
+
+/* ================================================================
+   CONVERTER
+   ================================================================ */
+.converter {
+  background: var(--n2);
+  border: 1px solid var(--n3);
+  border-radius: 8px;
+  padding: 28px 32px;
+  margin: 24px 0;
+}
+
+.converter-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.converter label {
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--n4);
+  min-width: 80px;
+}
+
+.converter input[type="datetime-local"],
+.converter input[type="text"] {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  padding: 8px 14px;
+  border-radius: 4px;
+  border: 1px solid var(--n3);
+  background: var(--void);
+  color: var(--n5);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.converter input:focus { border-color: var(--accent); }
+
+.converter .result {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  font-weight: 500;
+  color: var(--accent);
+  margin-top: 16px;
+  letter-spacing: 1px;
+}
+
+.converter .decoded {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--n4);
+  margin-top: 4px;
+}
+
+/* ================================================================
+   COMPARISON TABLE (index)
+   ================================================================ */
+.comparison td:first-child { font-weight: 500; }
+.comparison .sun { color: var(--sun); }
+.comparison .moon { color: var(--moon); }
+.comparison .bin { color: var(--bin); }
+
+/* ================================================================
+   CONSTRAINTS
+   ================================================================ */
+.constraint-box {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.constraint {
+  background: var(--n2);
+  border: 1px solid var(--n3);
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+}
+
+.constraint .component {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.constraint .range {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--n4);
+  margin-top: 4px;
+}
+
+.constraint .maps-to {
+  font-size: 14px;
+  color: var(--n5);
+  margin-top: 8px;
+}
+
+/* ================================================================
+   NOTES
+   ================================================================ */
+.note {
+  border-left: 3px solid var(--accent);
+  padding: 16px 20px;
+  background: var(--accent-dim);
+  border-radius: 0 8px 8px 0;
+  margin: 24px 0;
+  font-size: 15px;
+}
+
+/* ================================================================
+   FOOTER
+   ================================================================ */
+footer {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 40px 28px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--n4);
+  border-top: 1px solid var(--n3);
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media (max-width: 600px) {
+  main { padding: 80px 16px 80px; }
+  .scheme-card { padding: 20px; }
+  .formula { padding: 16px; font-size: 13px; }
+  .converter { padding: 16px; }
+  .converter .result { font-size: 22px; }
+  .constraint-box { grid-template-columns: 1fr; }
+  nav { padding: 10px 16px; font-size: 12px; }
+  .card-meta { flex-direction: column; gap: 8px; }
+}

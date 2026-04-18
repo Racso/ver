@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SunVer — Full Calendar Versioning</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    :root {
+      --accent: var(--sun);
+      --accent-dim: var(--sun-dim);
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="home">ver</a>
+  <span class="sep">/</span>
+  <a href="sun.html" class="active">SunVer</a>
+  <span class="sep">/</span>
+  <a href="moon.html">MoonVer</a>
+  <span class="sep">/</span>
+  <a href="bin.html">BinVer</a>
+</nav>
+
+<main>
+  <section class="hero">
+    <p class="subtitle">Full Calendar Versioning</p>
+    <h1><span class="accent">Sun</span>Ver</h1>
+    <p class="lead">
+      Read it like a sundial — just look. Year, month, day, and time are all directly
+      readable with zero math. The only cost: 10-minute resolution.
+    </p>
+  </section>
+
+  <section>
+    <h2>Formula</h2>
+    <div class="formula">
+      <span class="highlight">X</span> = year − 2025
+      <span class="comment">&emsp;// 0–255 → years 2025–2280</span><br>
+      <span class="highlight">Y</span> = month
+      <span class="comment">&emsp;// 1–12</span><br>
+      <span class="highlight">Z</span> = day × 1000 + hour × 10 + ⌊minute ÷ 10⌋
+      <span class="comment">&emsp;// 1000–31235</span>
+    </div>
+    <div class="constraint-box">
+      <div class="constraint">
+        <div class="component">X</div>
+        <div class="range">0 – 255</div>
+        <div class="maps-to">Year offset</div>
+      </div>
+      <div class="constraint">
+        <div class="component">Y</div>
+        <div class="range">1 – 12</div>
+        <div class="maps-to">Month</div>
+      </div>
+      <div class="constraint">
+        <div class="component">Z</div>
+        <div class="range">1000 – 31235</div>
+        <div class="maps-to">dd | HH | m</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Reading Z</h2>
+    <p>
+      Z encodes day, hour, and the tens digit of minutes as concatenated digits.
+      For a 4-digit Z, the first digit is the day; for a 5-digit Z, the first two are the day.
+      The next two digits are the hour. The last digit is the tens of minutes.
+    </p>
+    <div class="formula">
+      <span class="highlight">17083</span> → day <strong>17</strong>, hour <strong>08</strong>, minute <strong>30</strong><br>
+      <span class="highlight">1000</span>&nbsp; → day <strong>1</strong>, hour <strong>00</strong>, minute <strong>00</strong><br>
+      <span class="highlight">25183</span> → day <strong>25</strong>, hour <strong>18</strong>, minute <strong>30</strong><br>
+      <span class="highlight">5221</span>&nbsp; → day <strong>5</strong>, hour <strong>22</strong>, minute <strong>10</strong>
+    </div>
+    <p>
+      Formally: <code>day = Z ÷ 1000</code>, <code>hour = (Z mod 1000) ÷ 10</code>,
+      <code>minutes = (Z mod 10) × 10</code>. But in practice, you just read the digits.
+    </p>
+  </section>
+
+  <section>
+    <h2>Examples</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Datetime</th><th>Version</th><th>How to read it</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>2025-01-01 00:00</td><td class="version">0.1.1000</td><td>Year 0, Jan, day 1 00:00</td></tr>
+          <tr><td>2025-04-17 08:30</td><td class="version">0.4.17083</td><td>Year 0, Apr, day 17 08:30</td></tr>
+          <tr><td>2026-04-17 08:30</td><td class="version">1.4.17083</td><td>Year 1, Apr, day 17 08:30</td></tr>
+          <tr><td>2026-12-31 23:50</td><td class="version">1.12.31235</td><td>Year 1, Dec, day 31 23:50</td></tr>
+          <tr><td>2030-06-01 00:00</td><td class="version">5.6.1000</td><td>Year 5, Jun, day 1 00:00</td></tr>
+          <tr><td>2033-08-20 12:00</td><td class="version">8.8.20120</td><td>Year 8, Aug, day 20 12:00</td></tr>
+          <tr><td>2050-12-25 07:00</td><td class="version">25.12.25070</td><td>Year 25, Dec, day 25 07:00</td></tr>
+          <tr><td>2100-03-15 16:40</td><td class="version">75.3.15164</td><td>Year 75, Mar, day 15 16:40</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Converter</h2>
+    <div class="converter">
+      <div class="converter-row">
+        <label for="dt-input">Datetime</label>
+        <input type="datetime-local" id="dt-input">
+      </div>
+      <div class="result" id="result">—</div>
+      <div class="decoded" id="decoded"></div>
+    </div>
+    <div class="converter" style="margin-top: 12px">
+      <div class="converter-row">
+        <label for="ver-input">Version</label>
+        <input type="text" id="ver-input" placeholder="1.4.17083">
+      </div>
+      <div class="result" id="rev-result">—</div>
+      <div class="decoded" id="rev-decoded"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Properties</h2>
+    <div class="note">
+      <strong>Monotonic sorting.</strong> Versions sort correctly using standard version comparison
+      (X first, then Y, then Z), because year, month, and day+time are each in their own
+      component in descending significance order.
+    </div>
+    <div class="note">
+      <strong>255-year range.</strong> The epoch is 2025. X = 255 corresponds to the year 2280.
+      You will not run out.
+    </div>
+    <div class="note">
+      <strong>10-minute resolution.</strong> The last digit of Z represents tens of minutes (0–5).
+      Two builds within the same 10-minute window will produce the same version.
+      In practice this is a non-issue for release builds.
+    </div>
+  </section>
+
+  <section>
+    <h2>When to use SunVer</h2>
+    <p>
+      SunVer is best for <strong>human-facing releases</strong> — game builds, desktop apps,
+      mobile apps — where someone on the team will glance at a version number and want to
+      immediately know when it was built. The 10-minute resolution is more than sufficient
+      for any release cadence that involves humans.
+    </p>
+    <p>
+      For CI pipelines that produce multiple builds per minute, consider
+      <a href="moon.html">MoonVer</a> or <a href="bin.html">BinVer</a>.
+    </p>
+  </section>
+</main>
+
+<footer>
+  ver.rac.so — epoch 2025
+</footer>
+
+<script>
+const EPOCH = 2025;
+
+function toSunVer(dt) {
+  const x = dt.getFullYear() - EPOCH;
+  const y = dt.getMonth() + 1;
+  const z = dt.getDate() * 1000 + dt.getHours() * 10 + Math.floor(dt.getMinutes() / 10);
+  return `${x}.${y}.${z}`;
+}
+
+function fromSunVer(ver) {
+  const [x, y, z] = ver.split('.').map(Number);
+  if (isNaN(x) || isNaN(y) || isNaN(z)) return null;
+  const year = EPOCH + x;
+  const month = y;
+  const day = Math.floor(z / 1000);
+  const hour = Math.floor((z % 1000) / 10);
+  const min = (z % 10) * 10;
+  return new Date(year, month - 1, day, hour, min);
+}
+
+function fmt(dt) {
+  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')} ${String(dt.getHours()).padStart(2,'0')}:${String(Math.floor(dt.getMinutes()/10)*10).padStart(2,'0')}`;
+}
+
+function fmtFull(dt) {
+  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;
+}
+
+const dtInput = document.getElementById('dt-input');
+const verInput = document.getElementById('ver-input');
+const now = new Date();
+
+dtInput.value = now.getFullYear() + '-' +
+  String(now.getMonth()+1).padStart(2,'0') + '-' +
+  String(now.getDate()).padStart(2,'0') + 'T' +
+  String(now.getHours()).padStart(2,'0') + ':' +
+  String(now.getMinutes()).padStart(2,'0');
+
+function updateForward() {
+  if (!dtInput.value) return;
+  const dt = new Date(dtInput.value);
+  document.getElementById('result').textContent = toSunVer(dt);
+  document.getElementById('decoded').textContent = fmt(dt);
+}
+
+function updateReverse() {
+  const val = verInput.value.trim();
+  if (!val) { document.getElementById('rev-result').textContent = '—'; return; }
+  const dt = fromSunVer(val);
+  if (!dt || isNaN(dt.getTime())) {
+    document.getElementById('rev-result').textContent = 'invalid';
+    document.getElementById('rev-decoded').textContent = '';
+    return;
+  }
+  document.getElementById('rev-result').textContent = fmtFull(dt);
+  document.getElementById('rev-decoded').textContent = `year ${dt.getFullYear() - EPOCH}, month ${dt.getMonth()+1}`;
+}
+
+dtInput.addEventListener('input', updateForward);
+verInput.addEventListener('input', updateReverse);
+updateForward();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BinVer — Epoch Pack Versioning</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    :root {
+      --accent: var(--bin);
+      --accent-dim: var(--bin-dim);
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="home">ver</a>
+  <span class="sep">/</span>
+  <a href="sun.html">SunVer</a>
+  <span class="sep">/</span>
+  <a href="moon.html">MoonVer</a>
+  <span class="sep">/</span>
+  <a href="bin.html" class="active">BinVer</a>
+</nav>
+
+<main>
+  <section class="hero">
+    <p class="subtitle">Epoch Pack Versioning</p>
+    <h1><span class="accent">Bin</span>Ver</h1>
+    <p class="lead">
+      A 32-bit seconds-since-epoch timestamp, split across X.Y.Z. No legibility,
+      no wasted bits, no compromises. Maximum range, maximum precision.
+    </p>
+  </section>
+
+  <section>
+    <h2>Formula</h2>
+    <div class="formula">
+      s = seconds since 2025-01-01 00:00:00 UTC<br><br>
+      <span class="highlight">X</span> = (s &gt;&gt; 24) &amp; 0xFF
+      <span class="comment">&emsp;// high byte</span><br>
+      <span class="highlight">Y</span> = (s &gt;&gt; 16) &amp; 0xFF
+      <span class="comment">&emsp;// mid byte</span><br>
+      <span class="highlight">Z</span> = s &amp; 0xFFFF
+      <span class="comment">&emsp;// low 16 bits</span>
+    </div>
+    <p>
+      The version triple is simply a 32-bit unsigned integer in big-endian layout:
+      X holds bits 31–24, Y holds bits 23–16, Z holds bits 15–0. Reassemble with
+      <code>s = X×16777216 + Y×65536 + Z</code>, or equivalently
+      <code>s = (X &lt;&lt; 24) | (Y &lt;&lt; 16) | Z</code>.
+    </p>
+    <div class="constraint-box">
+      <div class="constraint">
+        <div class="component">X</div>
+        <div class="range">0 – 255</div>
+        <div class="maps-to">Bits 31–24</div>
+      </div>
+      <div class="constraint">
+        <div class="component">Y</div>
+        <div class="range">0 – 255</div>
+        <div class="maps-to">Bits 23–16</div>
+      </div>
+      <div class="constraint">
+        <div class="component">Z</div>
+        <div class="range">0 – 65535</div>
+        <div class="maps-to">Bits 15–0</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Examples</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Datetime (UTC)</th><th>Seconds</th><th>Version</th></tr>
+        </thead>
+        <tbody id="examples-body">
+        </tbody>
+      </table>
+    </div>
+    <p>
+      As you can see, BinVer versions are completely opaque. <code>4.117.830</code>
+      means nothing to a human. That's the point — this scheme prioritizes
+      machine efficiency over human readability.
+    </p>
+  </section>
+
+  <section>
+    <h2>Converter</h2>
+    <div class="converter">
+      <div class="converter-row">
+        <label for="dt-input">Datetime</label>
+        <input type="datetime-local" id="dt-input">
+      </div>
+      <div class="result" id="result">—</div>
+      <div class="decoded" id="decoded"></div>
+    </div>
+    <div class="converter" style="margin-top: 12px">
+      <div class="converter-row">
+        <label for="ver-input">Version</label>
+        <input type="text" id="ver-input" placeholder="0.23.51966">
+      </div>
+      <div class="result" id="rev-result">—</div>
+      <div class="decoded" id="rev-decoded"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Properties</h2>
+    <div class="note">
+      <strong>Monotonic sorting.</strong> Because the integer is stored big-endian across X.Y.Z,
+      standard version comparison produces the same order as comparing the raw integer.
+      Later timestamps always produce higher versions.
+    </div>
+    <div class="note">
+      <strong>136-year range.</strong> 2<sup>32</sup> = 4,294,967,296 seconds ≈ 136 years.
+      With epoch 2025, the scheme covers through approximately 2161.
+    </div>
+    <div class="note">
+      <strong>Second resolution.</strong> Every second maps to a unique version.
+      No two builds can collide unless they happen within the same second.
+    </div>
+    <div class="note">
+      <strong>Trivial to implement.</strong> Three bit shifts. No multiplication,
+      no division, no month tables, no edge cases.
+    </div>
+  </section>
+
+  <section>
+    <h2>When to use BinVer</h2>
+    <p>
+      BinVer is for systems where humans never look at version numbers directly:
+      embedded firmware, infrastructure services, internal tools, automated pipelines.
+      If your version is only ever compared by machines, there's no reason to waste
+      encoding space on legibility. Use every bit.
+    </p>
+    <p>
+      If anyone on your team will ever say a version number out loud, use
+      <a href="sun.html">SunVer</a> or <a href="moon.html">MoonVer</a> instead.
+    </p>
+  </section>
+</main>
+
+<footer>
+  ver.rac.so — epoch 2025
+</footer>
+
+<script>
+const EPOCH_MS = new Date(2025, 0, 1, 0, 0, 0).getTime();
+
+function toBinVer(dt) {
+  const s = Math.floor((dt.getTime() - EPOCH_MS) / 1000);
+  const x = (s >>> 24) & 0xFF;
+  const y = (s >>> 16) & 0xFF;
+  const z = s & 0xFFFF;
+  return { ver: `${x}.${y}.${z}`, s };
+}
+
+function fromBinVer(ver) {
+  const [x, y, z] = ver.split('.').map(Number);
+  if (isNaN(x) || isNaN(y) || isNaN(z)) return null;
+  const s = (x * 16777216) + (y * 65536) + z;
+  return new Date(EPOCH_MS + s * 1000);
+}
+
+function fmt(dt) {
+  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}:${String(dt.getSeconds()).padStart(2,'0')}`;
+}
+
+// Populate examples
+const exampleDates = [
+  new Date(2025, 0, 1, 0, 0, 0),
+  new Date(2025, 3, 17, 8, 30, 0),
+  new Date(2026, 3, 17, 8, 30, 0),
+  new Date(2026, 11, 31, 23, 59, 59),
+  new Date(2030, 5, 1, 0, 0, 0),
+  new Date(2033, 7, 20, 12, 0, 0),
+  new Date(2050, 11, 25, 7, 0, 0),
+];
+
+const tbody = document.getElementById('examples-body');
+exampleDates.forEach(dt => {
+  const { ver, s } = toBinVer(dt);
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td>${fmt(dt)}</td><td>${s.toLocaleString()}</td><td class="version">${ver}</td>`;
+  tbody.appendChild(tr);
+});
+
+// Converter
+const dtInput = document.getElementById('dt-input');
+const verInput = document.getElementById('ver-input');
+const now = new Date();
+
+dtInput.value = now.getFullYear() + '-' +
+  String(now.getMonth()+1).padStart(2,'0') + '-' +
+  String(now.getDate()).padStart(2,'0') + 'T' +
+  String(now.getHours()).padStart(2,'0') + ':' +
+  String(now.getMinutes()).padStart(2,'0');
+
+function updateForward() {
+  if (!dtInput.value) return;
+  const dt = new Date(dtInput.value);
+  const { ver, s } = toBinVer(dt);
+  document.getElementById('result').textContent = ver;
+  document.getElementById('decoded').textContent = `${s.toLocaleString()} seconds since epoch`;
+}
+
+function updateReverse() {
+  const val = verInput.value.trim();
+  if (!val) { document.getElementById('rev-result').textContent = '—'; return; }
+  const dt = fromBinVer(val);
+  if (!dt || isNaN(dt.getTime())) {
+    document.getElementById('rev-result').textContent = 'invalid';
+    document.getElementById('rev-decoded').textContent = '';
+    return;
+  }
+  document.getElementById('rev-result').textContent = fmt(dt);
+  const s = Math.floor((dt.getTime() - EPOCH_MS) / 1000);
+  document.getElementById('rev-decoded').textContent = `${s.toLocaleString()} seconds since epoch`;
+}
+
+dtInput.addEventListener('input', updateForward);
+verInput.addEventListener('input', updateReverse);
+updateForward();
+</script>
+
+</body>
+</html>
