@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ver — Datetime Versioning for Real Projects</title>
+  <title>Ver — Datetime Versioning</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,8 +12,6 @@
   <a href="index.html" class="home active">ver</a>
   <span class="sep">/</span>
   <a href="sun.html">SunVer</a>
-  <span class="sep">/</span>
-  <a href="light.html">LightVer</a>
   <span class="sep">/</span>
   <a href="moon.html">MoonVer</a>
   <span class="sep">/</span>
@@ -25,95 +23,53 @@
     <p class="subtitle">Datetime Versioning</p>
     <h1>Ship dates,<br>not <span class="accent">numbers.</span></h1>
     <p class="lead">
-      Version numbers that tell you <em>when</em> something was built —
-      automatically, monotonically, and without anyone having to think about it.
+      Your build timestamp is your version number.
+      Automatic, monotonic, and meaningful.
     </p>
   </section>
 
   <section>
-    <h2>The problem</h2>
     <p>
-      SemVer exists to communicate backwards compatibility. That's useful for
-      libraries — but most software isn't a library. A single-player game doesn't have
-      a "backwards-compatible API." A multiplayer game might have multiple internal
-      systems that need their own compatibility tracking, but the game itself doesn't
-      fit the SemVer model.
+      Most software isn't a library. A game, a desktop app, a mobile app — they don't
+      have "backwards-compatible APIs." Yet teams still burn time deciding whether the
+      next build is 1.4.2 or 1.5.0.
     </p>
     <p>
-      In practice, when teams are building, iterating, testing, and shipping, the questions
-      they actually ask about versions are:
-    </p>
-    <ul style="margin: 16px 0 16px 24px; line-height: 2;">
-      <li>"Is this screenshot from the latest build or an old one?"</li>
-      <li>"Does this build include the fix I pushed yesterday around 3pm?"</li>
-      <li>"Which of these two versions came first?"</li>
-    </ul>
-    <p>
-      These are questions about <strong>time</strong>, not compatibility. Ver answers them.
+      The questions teams actually ask are about <strong>time</strong>:
+      "Is this the latest build?" "Does this include yesterday's fix?"
+      "Which came first?" Ver answers those questions directly.
+      All timestamps are <strong>UTC</strong>.
     </p>
   </section>
 
   <section>
-    <h2>Design goals</h2>
-    <div class="note" style="border-left-color: var(--n4)">
-      <strong>1. Don't get in the way.</strong>
-      No one should have to decide what the next version number is. No debates about
-      whether this is a minor bump or a patch. The build timestamp <em>is</em> the version.
-    </div>
-    <div class="note" style="border-left-color: var(--n4)">
-      <strong>2. Fully automatable.</strong>
-      Generate the version from the current time. No state files, no incrementing counters,
-      no coordination between CI jobs. Guaranteed monotonically increasing.
-    </div>
-    <div class="note" style="border-left-color: var(--n4)">
-      <strong>3. Meaningful information.</strong>
-      A version number should tell the team something useful at a glance.
-      "When was this built?" is more useful than "what arbitrary number did we pick?"
-    </div>
-  </section>
-
-  <section>
-    <h3>The family</h3>
+    <h3>The schemes</h3>
     <div class="schemes">
       <a href="sun.html" class="scheme-card" data-scheme="sun">
         <div class="card-name">SunVer</div>
-        <div class="card-tagline">The version <em>is</em> the date. No encoding, no math.</div>
-        <div class="card-spec">X = year &emsp; Y = MMdd &emsp; Z = HHmm</div>
+        <div class="card-tagline">The version <em>is</em> the date. No encoding.</div>
+        <div class="card-spec">2026.417.830</div>
         <div class="card-meta">
-          <span><span class="label">range</span> <span class="value">unlimited</span></span>
           <span><span class="label">resolution</span> <span class="value">1 min</span></span>
           <span><span class="label">legibility</span> <span class="value">perfect</span></span>
           <span><span class="label">MSI</span> <span class="value">no</span></span>
         </div>
       </a>
-      <a href="light.html" class="scheme-card" data-scheme="light">
-        <div class="card-name">LightVer</div>
-        <div class="card-tagline">SunVer's constrained sibling. Fits within MSI limits.</div>
-        <div class="card-spec">X = year − 2000 &emsp; Y = month &emsp; Z = dd×1000 + HH×10 + m</div>
+      <a href="moon.html" class="scheme-card" data-scheme="moon">
+        <div class="card-name">MoonVer</div>
+        <div class="card-tagline">SunVer within MSI limits. 10-minute resolution.</div>
+        <div class="card-spec">26.4.17083</div>
         <div class="card-meta">
-          <span><span class="label">range</span> <span class="value">255 years</span></span>
           <span><span class="label">resolution</span> <span class="value">10 min</span></span>
           <span><span class="label">legibility</span> <span class="value">high</span></span>
           <span><span class="label">MSI</span> <span class="value">yes</span></span>
         </div>
       </a>
-      <a href="moon.html" class="scheme-card" data-scheme="moon">
-        <div class="card-name">MoonVer</div>
-        <div class="card-tagline">Minute precision under MSI constraints. One ÷20 to decode.</div>
-        <div class="card-spec">X = offset×20 + month &emsp; Y = day &emsp; Z = HHmm</div>
-        <div class="card-meta">
-          <span><span class="label">range</span> <span class="value">12 years</span></span>
-          <span><span class="label">resolution</span> <span class="value">1 min</span></span>
-          <span><span class="label">legibility</span> <span class="value">partial</span></span>
-          <span><span class="label">MSI</span> <span class="value">yes</span></span>
-        </div>
-      </a>
       <a href="bin.html" class="scheme-card" data-scheme="bin">
         <div class="card-name">BinVer</div>
-        <div class="card-tagline">Opaque. Maximum range. No pretense.</div>
-        <div class="card-spec">X = (s≫24) &amp; 0xFF &emsp; Y = (s≫16) &amp; 0xFF &emsp; Z = s &amp; 0xFFFF</div>
+        <div class="card-tagline">Opaque packed timestamp. Maximum precision.</div>
+        <div class="card-spec">1.65.9574</div>
         <div class="card-meta">
-          <span><span class="label">range</span> <span class="value">136 years</span></span>
           <span><span class="label">resolution</span> <span class="value">1 sec</span></span>
           <span><span class="label">legibility</span> <span class="value">none</span></span>
           <span><span class="label">MSI</span> <span class="value">yes</span></span>
@@ -123,70 +79,13 @@
   </section>
 
   <section>
-    <h2>Comparison</h2>
-    <div class="table-wrap">
-      <table class="comparison">
-        <thead>
-          <tr>
-            <th></th>
-            <th>Resolution</th>
-            <th>Range</th>
-            <th>Legibility</th>
-            <th>MSI</th>
-            <th>Best for</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="sun">SunVer</td>
-            <td>1 min</td>
-            <td>unlimited</td>
-            <td>Perfect</td>
-            <td>No</td>
-            <td>Default choice</td>
-          </tr>
-          <tr>
-            <td class="light">LightVer</td>
-            <td>10 min</td>
-            <td>255 yr</td>
-            <td>High</td>
-            <td>Yes</td>
-            <td>MSI + readability</td>
-          </tr>
-          <tr>
-            <td class="moon">MoonVer</td>
-            <td>1 min</td>
-            <td>12 yr</td>
-            <td>Partial</td>
-            <td>Yes</td>
-            <td>MSI + precision</td>
-          </tr>
-          <tr>
-            <td class="bin">BinVer</td>
-            <td>1 sec</td>
-            <td>136 yr</td>
-            <td>None</td>
-            <td>Yes</td>
-            <td>Machine-only</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section>
     <h2>How to choose</h2>
-    <p>
-      Start with <strong>SunVer</strong> unless you have a reason not to. Then:
-    </p>
     <div class="formula">
       Need Windows MSI?<br>
       &emsp;├─ No → <span class="highlight" style="color: var(--sun)">SunVer</span><br>
-      &emsp;└─ Yes → Need minute precision?<br>
-      &emsp;&emsp;&emsp;&emsp;├─ No → <span class="highlight" style="color: var(--light)">LightVer</span><br>
-      &emsp;&emsp;&emsp;&emsp;└─ Yes → Is the project lifespan &lt; 12 years?<br>
-      &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;├─ Yes → <span class="highlight" style="color: var(--moon)">MoonVer</span><br>
-      &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;└─ No → <span class="highlight" style="color: var(--bin)">BinVer</span>
+      &emsp;└─ Yes → Need human-readable versions?<br>
+      &emsp;&emsp;&emsp;&emsp;├─ Yes → <span class="highlight" style="color: var(--moon)">MoonVer</span><br>
+      &emsp;&emsp;&emsp;&emsp;└─ No → <span class="highlight" style="color: var(--bin)">BinVer</span>
     </div>
   </section>
 
@@ -197,14 +96,10 @@
         <label for="dt-input">Datetime</label>
         <input type="datetime-local" id="dt-input">
       </div>
-      <div style="margin-top: 20px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+      <div style="margin-top: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
         <div>
           <h3 style="color: var(--sun)">SunVer</h3>
           <div class="result" id="sun-result" style="color: var(--sun)">—</div>
-        </div>
-        <div>
-          <h3 style="color: var(--light)">LightVer</h3>
-          <div class="result" id="light-result" style="color: var(--light)">—</div>
         </div>
         <div>
           <h3 style="color: var(--moon)">MoonVer</h3>
@@ -217,52 +112,27 @@
       </div>
     </div>
   </section>
-
-  <section>
-    <h2>SemVer isn't wrong</h2>
-    <p>
-      SemVer communicates <em>compatibility</em>. Ver communicates <em>time</em>.
-      They serve different purposes. Use SemVer for libraries where API contracts matter.
-      Use Ver for applications, game builds, firmware, CI artifacts — anything where
-      "when was this built?" is more useful than "is this backwards compatible?".
-    </p>
-  </section>
 </main>
 
 <footer>ver.rac.so</footer>
 
 <script>
-const EPOCH_MOON = 2025;
 const EPOCH_BIN_MS = new Date(2025, 0, 1, 0, 0, 0).getTime();
 
 function toSunVer(dt) {
-  const x = dt.getFullYear();
-  const y = (dt.getMonth() + 1) * 100 + dt.getDate();
-  const z = dt.getHours() * 100 + dt.getMinutes();
-  return `${x}.${y}.${z}`;
+  return `${dt.getFullYear()}.${(dt.getMonth()+1)*100+dt.getDate()}.${dt.getHours()*100+dt.getMinutes()}`;
 }
 
-function toLightVer(dt) {
+function toMoonVer(dt) {
   const x = dt.getFullYear() - 2000;
   const y = dt.getMonth() + 1;
   const z = dt.getDate() * 1000 + dt.getHours() * 10 + Math.floor(dt.getMinutes() / 10);
   return `${x}.${y}.${z}`;
 }
 
-function toMoonVer(dt) {
-  const offset = dt.getFullYear() - EPOCH_MOON;
-  const x = offset * 20 + (dt.getMonth() + 1);
-  const y = dt.getDate();
-  const z = dt.getHours() * 100 + dt.getMinutes();
-  return `${x}.${y}.${z}`;
-}
-
 function toBinVer(dt) {
   const s = Math.floor((dt.getTime() - EPOCH_BIN_MS) / 1000);
-  const x = (s >>> 24) & 0xFF;
-  const y = (s >>> 16) & 0xFF;
-  const z = s & 0xFFFF;
-  return `${x}.${y}.${z}`;
+  return `${(s>>>24)&0xFF}.${(s>>>16)&0xFF}.${s&0xFFFF}`;
 }
 
 const input = document.getElementById('dt-input');
@@ -274,11 +144,9 @@ input.value = now.getFullYear() + '-' +
   String(now.getMinutes()).padStart(2,'0');
 
 function update() {
-  const val = input.value;
-  if (!val) return;
-  const dt = new Date(val);
+  if (!input.value) return;
+  const dt = new Date(input.value);
   document.getElementById('sun-result').textContent = toSunVer(dt);
-  document.getElementById('light-result').textContent = toLightVer(dt);
   document.getElementById('moon-result').textContent = toMoonVer(dt);
   document.getElementById('bin-result').textContent = toBinVer(dt);
 }
