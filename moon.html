@@ -65,9 +65,8 @@
   <section>
     <h2>Reading Z</h2>
     <p>
-      Z encodes day, hour, and the tens digit of minutes as concatenated digits.
-      For a 4-digit Z, the first digit is the day; for a 5-digit Z, the first two are the day.
-      The next two digits are the hour. The last digit is the tens of minutes.
+      Just read the digits: day, hour, tens of minutes. The last digit always represents
+      the tens of minutes of the datetime, so :04 becomes 0 and :38 becomes 3.
     </p>
     <div class="formula">
       <span class="highlight">17083</span> → day <strong>17</strong>, hour <strong>08</strong>, minute <strong>30</strong><br>
@@ -77,7 +76,7 @@
     </div>
     <p>
       Formally: <code>day = Z ÷ 1000</code>, <code>hour = (Z mod 1000) ÷ 10</code>,
-      <code>minutes = (Z mod 10) × 10</code>. But in practice, you just read the digits.
+      <code>minutes = (Z mod 10) × 10</code>.
     </p>
   </section>
 
@@ -141,19 +140,6 @@
       <strong>Full MSI compatibility.</strong> All components fit within 255.255.65535.
       Works everywhere: Windows MSI, macOS, Linux, NSIS, MSIX, iOS, Android.
     </div>
-  </section>
-
-  <section>
-    <h2>When to use MoonVer</h2>
-    <p>
-      Use MoonVer when you need <strong>Windows MSI compatibility</strong> but still want
-      version numbers your team can read at a glance. Year and month are directly readable
-      in X and Y. Only Z requires a quick visual parse of day+time — and that becomes
-      second nature fast.
-    </p>
-    <p>
-      If you don't need MSI, use <a href="sun.html">SunVer</a> — it's strictly simpler.
-    </p>
   </section>
 </main>
 

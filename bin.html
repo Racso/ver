@@ -28,15 +28,15 @@
   <section class="hero">
     <h1><span class="accent">Bin</span>Ver</h1>
     <p class="lead">
-      A 32-bit seconds-since-epoch timestamp, split across X.Y.Z. No legibility,
-      no wasted bits, no compromises. Maximum range, maximum precision.
+      A 32-bit seconds-since-epoch timestamp, split across X.Y.Z.
+      Maximum range and precision.
     </p>
   </section>
 
   <section>
     <h2>Formula</h2>
     <div class="formula">
-      s = seconds since 2025-01-01 00:00:00 UTC<br><br>
+      s = seconds since 2000-01-01 00:00:00 UTC<br><br>
       <span class="highlight">X</span> = (s &gt;&gt; 24) &amp; 0xFF
       <span class="comment">&emsp;// high byte</span><br>
       <span class="highlight">Y</span> = (s &gt;&gt; 16) &amp; 0xFF
@@ -80,11 +80,6 @@
         </tbody>
       </table>
     </div>
-    <p>
-      As you can see, BinVer versions are completely opaque. <code>4.117.830</code>
-      means nothing to a human. That's the point — this scheme prioritizes
-      machine efficiency over human readability.
-    </p>
   </section>
 
   <section>
@@ -116,7 +111,7 @@
     </div>
     <div class="note">
       <strong>136-year range.</strong> 2<sup>32</sup> = 4,294,967,296 seconds ≈ 136 years.
-      With epoch 2025, the scheme covers through approximately 2161.
+      With epoch 2000, the scheme covers through approximately 2136.
     </div>
     <div class="note">
       <strong>Second resolution.</strong> Every second maps to a unique version.
@@ -127,28 +122,12 @@
       no division, no month tables, no edge cases.
     </div>
   </section>
-
-  <section>
-    <h2>When to use BinVer</h2>
-    <p>
-      BinVer is for systems where humans never look at version numbers directly:
-      embedded firmware, infrastructure services, internal tools, automated pipelines.
-      If your version is only ever compared by machines, there's no reason to waste
-      encoding space on legibility. Use every bit.
-    </p>
-    <p>
-      If anyone on your team will ever say a version number out loud, use
-      <a href="sun.html">SunVer</a> or <a href="moon.html">MoonVer</a> instead.
-    </p>
-  </section>
 </main>
 
-<footer>
-  ver.rac.so — epoch 2025
-</footer>
+<footer>ver.rac.so</footer>
 
 <script>
-const EPOCH_MS = new Date(2025, 0, 1, 0, 0, 0).getTime();
+const EPOCH_MS = new Date(2000, 0, 1, 0, 0, 0).getTime();
 
 function toBinVer(dt) {
   const s = Math.floor((dt.getTime() - EPOCH_MS) / 1000);

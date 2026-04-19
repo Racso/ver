@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ver — Datetime Versioning</title>
+  <title>Datetime-based versioning schemes</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -20,29 +20,10 @@
 
 <main>
   <section class="hero">
-    <h1>Ship dates,<br>not <span class="accent">numbers.</span></h1>
-    <p class="lead">
-      Your build timestamp is your version number.
-      Automatic, monotonic, and meaningful.
-    </p>
+    <h1>Datetime-based<br><span class="accent">versioning</span> schemes</h1>
   </section>
 
   <section>
-    <p>
-      Most software isn't a library. A game, a desktop app, a mobile app — they don't
-      have "backwards-compatible APIs." Yet teams still burn time deciding whether the
-      next build is 1.4.2 or 1.5.0.
-    </p>
-    <p>
-      The questions teams actually ask are about <strong>time</strong>:
-      "Is this the latest build?" "Does this include yesterday's fix?"
-      "Which came first?" Datetime versioning answers those questions directly.
-      All timestamps are <strong>UTC</strong>.
-    </p>
-  </section>
-
-  <section>
-    <h3>The schemes</h3>
     <div class="schemes">
       <a href="sun.html" class="scheme-card" data-scheme="sun">
         <div class="card-name">SunVer</div>
@@ -84,7 +65,7 @@
         <label for="dt-input">Datetime</label>
         <input type="datetime-local" id="dt-input">
       </div>
-      <div style="margin-top: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+      <div class="try-results">
         <div>
           <h3 style="color: var(--sun)">SunVer</h3>
           <div class="result" id="sun-result" style="color: var(--sun)">—</div>
@@ -105,7 +86,7 @@
 <footer>ver.rac.so</footer>
 
 <script>
-const EPOCH_BIN_MS = new Date(2025, 0, 1, 0, 0, 0).getTime();
+const EPOCH_BIN_MS = new Date(2000, 0, 1, 0, 0, 0).getTime();
 
 function toSunVer(dt) {
   return `${dt.getFullYear()}.${(dt.getMonth()+1)*100+dt.getDate()}.${dt.getHours()*100+dt.getMinutes()}`;
