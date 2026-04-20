@@ -17,7 +17,7 @@ jobs:
 
       - name: Deploy to Poof!
         run: |
-          tar -czf site.tar.gz -C . .
+          tar -czf site.tar.gz --exclude=.git -C . .
           curl -fsSL -X POST "${{ secrets.POOF_URL }}/projects/ver/deploy/static" \
             -H "Authorization: Bearer ${{ secrets.POOF_TOKEN }}" \
             -H "Content-Type: application/gzip" \
